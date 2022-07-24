@@ -6,9 +6,12 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/lemon-mint/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 	ln, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
