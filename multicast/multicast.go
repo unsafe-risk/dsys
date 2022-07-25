@@ -25,7 +25,6 @@ type Multicast struct {
 	stop    chan struct{}
 	ln      *net.UDPConn
 	addr    *net.UDPAddr
-	conn    *net.UDPConn
 	C       chan PeerInfo
 	myaddr  AddrInfo
 }
@@ -55,11 +54,6 @@ func (m *Multicast) Start() error {
 		return err
 	}
 	m.ln = ln
-	conn, err := net.DialUDP("udp", nil, addr)
-	if err != nil {
-		return err
-	}
-	m.conn = conn
 	go m.startBroadcast()
 	go m.startListen()
 	return nil
@@ -71,7 +65,7 @@ func (m *Multicast) startBroadcast() {
 	for {
 		select {
 		case <-t.C:
-			_, err := m.conn.Write(m.myaddr)
+			_, err := m.ln.WriteToUDP(m.myaddr, m.addr)
 			if err != nil {
 				return
 			}
@@ -112,7 +106,6 @@ func (m *Multicast) Stop() {
 	}
 	close(m.stop)
 	m.ln.Close()
-	m.conn.Close()
 	close(m.C)
 	m.started = false
 }
