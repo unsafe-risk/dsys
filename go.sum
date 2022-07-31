@@ -2,6 +2,8 @@ github.com/klauspost/cpuid/v2 v2.0.12 h1:p9dKCg8i4gmOxtv35DvrYoWqYzQrvEVdjQ762Y0
 github.com/klauspost/cpuid/v2 v2.0.12/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuObKfj5c0PQa7c=
 github.com/lemon-mint/experiment v0.0.0-20220724083816-3fd4f8369086 h1:VXDcMBhRu1JWbItjdjCtt1MWyzDeA270ecuXsSqiQ5o=
 github.com/lemon-mint/experiment v0.0.0-20220724083816-3fd4f8369086/go.mod h1:j9w9InGWO6lY4KQoueuFdaJDE5xxLEm6Fn2e+6HylOY=
+github.com/lemon-mint/experiment v0.0.0-20220731113230-331db368b0c2 h1:pk+3yThg76nCR+B9+KXmxWXf03hD+U9+H0I1JN65oJs=
+github.com/lemon-mint/experiment v0.0.0-20220731113230-331db368b0c2/go.mod h1:j9w9InGWO6lY4KQoueuFdaJDE5xxLEm6Fn2e+6HylOY=
 github.com/lemon-mint/godotenv v1.0.3 h1:wJBuGdp5eez/ycl9c8502qLj1RBPRHLDHTR6eoD/pwM=
 github.com/lemon-mint/godotenv v1.0.3/go.mod h1:hBLJjPZkQ2QMrEwirLCQ+tRkWBKufZ1VxoqpZixGUYo=
 github.com/zeebo/assert v1.1.0 h1:hU1L1vLTHsnO8x8c9KAR5GmM5QscxHg5RNU5z5qbUWY=
