@@ -8,6 +8,8 @@ github.com/lemon-mint/experiment v0.0.0-20220731150925-6356879166ab h1:ml2CoZc7u
 github.com/lemon-mint/experiment v0.0.0-20220731150925-6356879166ab/go.mod h1:j9w9InGWO6lY4KQoueuFdaJDE5xxLEm6Fn2e+6HylOY=
 github.com/lemon-mint/experiment v0.0.0-20220805133846-8659c2e08cc1 h1:kHTAldoag8oogRguuuRcyRdGx6PCdWaRdiLTXku2wtk=
 github.com/lemon-mint/experiment v0.0.0-20220805133846-8659c2e08cc1/go.mod h1:j9w9InGWO6lY4KQoueuFdaJDE5xxLEm6Fn2e+6HylOY=
+github.com/lemon-mint/experiment v0.0.0-20220807143051-1f14f74411a8 h1:3a7YEFGBILQwHDWO0qe8dNGYtVMoAjiDasRJKLHn6co=
+github.com/lemon-mint/experiment v0.0.0-20220807143051-1f14f74411a8/go.mod h1:j9w9InGWO6lY4KQoueuFdaJDE5xxLEm6Fn2e+6HylOY=
 github.com/lemon-mint/godotenv v1.0.3 h1:wJBuGdp5eez/ycl9c8502qLj1RBPRHLDHTR6eoD/pwM=
 github.com/lemon-mint/godotenv v1.0.3/go.mod h1:hBLJjPZkQ2QMrEwirLCQ+tRkWBKufZ1VxoqpZixGUYo=
 github.com/zeebo/assert v1.1.0 h1:hU1L1vLTHsnO8x8c9KAR5GmM5QscxHg5RNU5z5qbUWY=
