@@ -13,6 +13,6 @@ require (
 )
 
 require (
-	github.com/lemon-mint/experiment v0.0.0-20220813145900-f3265be929a5
+	github.com/lemon-mint/experiment v0.0.7
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8
 )
