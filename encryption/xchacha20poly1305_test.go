@@ -16,7 +16,7 @@ func TestXChaCha20Poly1305Box(t *testing.T) {
 	if &buffer[0] != &encrypted[0] {
 		t.Fatal("buffer and encrypted are not the same")
 	}
-	decrypted, err := box.Open(buffer, encrypted)
+	decrypted, err := box.Open(encrypted)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func BenchmarkXChaCha20Poly1305BoxOpen(b *testing.B) {
 		for p.Next() {
 			copy(encrypted2[:len(encrypted)], encrypted)
 			encrypted2 = encrypted2[:len(encrypted)]
-			out, err := box.Open(buffer, encrypted2)
+			out, err := box.Open(encrypted2)
 			if err != nil || string(out) != string(plaintext) {
 				panic("failed to open: " + err.Error())
 			}

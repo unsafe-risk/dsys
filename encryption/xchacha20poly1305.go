@@ -4,7 +4,7 @@ import (
 	"crypto/cipher"
 	"errors"
 
-	"github.com/lemon-mint/experiment/util/noescape"
+	"v8.run/go/exp/util/noescape"
 	"github.com/zeebo/blake3"
 	"golang.org/x/crypto/chacha20poly1305"
 )
@@ -42,7 +42,7 @@ func (ab *XChaCha20Poly1305Box) Seal(dst, plaintext []byte) []byte {
 
 var ErrInvalidCiphertext = errors.New("xchacha20poly1305: invalid ciphertext")
 
-func (ab *XChaCha20Poly1305Box) Open(dst, ciphertext []byte) ([]byte, error) {
+func (ab *XChaCha20Poly1305Box) Open(ciphertext []byte) ([]byte, error) {
 	if len(ciphertext) < 24 {
 		return nil, ErrInvalidCiphertext
 	}

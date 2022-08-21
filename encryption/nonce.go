@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"sync"
 
-	"github.com/lemon-mint/experiment/util/noescape"
+	"v8.run/go/exp/util/noescape"
 )
 
 type noncebox struct {
