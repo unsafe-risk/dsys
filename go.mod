@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/lemon-mint/godotenv v1.0.3
 	github.com/zeebo/blake3 v0.2.3
-	golang.org/x/crypto v0.0.0-20220824171710-5757bc0c5503
+	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d
 	v8.run/go/exp v0.0.8
 )
 
