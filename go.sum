@@ -20,3 +20,5 @@ v8.run/go/exp v0.0.7 h1:Y9ll+IlfZ7EpDWvqvgOGbvJuzi39GICHoGBCVGwRxcE=
 v8.run/go/exp v0.0.7/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
 v8.run/go/exp v0.0.8 h1:RlwZ6TWdOv2nvKk9TntJs4NtNBGT0EhISfXZrYNPl/g=
 v8.run/go/exp v0.0.8/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
+v8.run/go/exp v0.0.10 h1:yjINp83quK6UWO2uwiwNMx5KPJJdRGEY2NJ8e63Nits=
+v8.run/go/exp v0.0.10/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
