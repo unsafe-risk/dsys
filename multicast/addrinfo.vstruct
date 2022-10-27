@@ -1,4 +1,0 @@
-struct AddrInfo {
-    string ip;
-    uint16 port;
-}

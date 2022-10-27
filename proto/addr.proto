@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package="v8.run/go/dsys/proto";
+package proto;
+
+enum Protocol {
+    GRPC = 0;
+    HTTPRPC = 1;
+}
+
+message Address {
+    Protocol protocol = 1;
+    string   address = 2;
+}

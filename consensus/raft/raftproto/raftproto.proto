@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package="v8.run/go/dsys/consensus/raft/raftproto";
+package proto;
+
+enum EntryType {
+    EntrySystem = 0;
+    EntryUser = 1;
+}
+
+message Entry {
+    uint64 Term = 10;
+    uint64 Index = 20;
+    EntryType Type = 30;
+    bytes Data = 40;
+}
