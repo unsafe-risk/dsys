@@ -14,3 +14,55 @@ message Entry {
     EntryType Type = 30;
     bytes Data = 40;
 }
+
+
+message PersistentState {
+    uint64 Term = 10;
+    uint64 VotedFor = 20;
+}
+
+message VolatileState {
+    uint64 CommitIndex = 10;
+    uint64 LastApplied = 20;
+
+    map<uint64,uint64> NextIndex = 30;
+    map<uint64,uint64> MatchIndex = 40;
+}
+
+message State {
+    PersistentState Persistent = 10;
+    VolatileState Volatile = 20;
+}
+
+message Snapshot {
+    uint64 LastIncludedIndex = 10;
+    uint64 LastIncludedTerm = 20;
+    bytes Data = 30;
+}
+
+message AppendEntriesRequest {
+    uint64 ConsensusGroup = 10;
+    uint64 Term = 20;
+    uint64 LeaderId = 30;
+    uint64 PrevLogIndex = 40;
+    uint64 PrevLogTerm = 50;
+    repeated Entry Entries = 60;
+    uint64 LeaderCommit = 70;
+}
+
+message AppendEntriesResponse {
+    uint64 ConsensusGroup = 10;
+    uint64 Term = 20;
+    bool Success = 30;
+}
+
+message Message {
+    oneof Message {
+        AppendEntriesRequest AppendEntriesRequest = 10;
+        AppendEntriesResponse AppendEntriesResponse = 20;
+    }
+}
+
+service ConsensusService {
+    rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse) {};
+}
