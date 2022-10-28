@@ -15,10 +15,10 @@ message Entry {
     bytes Data = 40;
 }
 
-
 message PersistentState {
     uint64 Term = 10;
-    uint64 VotedFor = 20;
+    uint64 VotedTerm = 20;
+    uint64 VotedFor = 30;
 }
 
 message VolatileState {
@@ -56,13 +56,30 @@ message AppendEntriesResponse {
     bool Success = 30;
 }
 
+message RequestVoteRequest {
+    uint64 ConsensusGroup = 10;
+    uint64 Term = 20;
+    uint64 CandidateID = 30;
+    uint64 LastLogIndex = 40;
+    uint64 LastLogTerm = 50;
+}
+
+message RequestVoteResponse {
+    uint64 ConsensusGroup = 10;
+    uint64 Term = 20;
+    bool VoteGranted = 30;
+}
+
 message Message {
     oneof Message {
         AppendEntriesRequest AppendEntriesRequest = 10;
         AppendEntriesResponse AppendEntriesResponse = 20;
+        RequestVoteRequest RequestVoteRequest = 30;
+        RequestVoteResponse RequestVoteResponse = 40;
     }
 }
 
 service ConsensusService {
     rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse) {};
+    rpc RequestVote(RequestVoteRequest) returns (RequestVoteResponse) {};
 }
