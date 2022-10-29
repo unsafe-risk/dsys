@@ -10,7 +10,7 @@ require (
 	golang.org/x/tools v0.1.12
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
-	v8.run/go/exp v0.0.15
+	v8.run/go/exp v0.0.17
 )
 
 require (
