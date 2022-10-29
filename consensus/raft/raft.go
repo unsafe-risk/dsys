@@ -2,6 +2,8 @@ package raft
 
 import (
 	"errors"
+	"sync"
+	"sync/atomic"
 
 	"v8.run/go/dsys/consensus/raft/raftproto"
 )
@@ -19,24 +21,42 @@ type Group struct {
 	GroupID uint64
 	NodeID  uint64
 
-	Role    Role
-	State   raftproto.State
+	mu     sync.Mutex
+	Config Config
+	Role   Role
+	State  raftproto.State
+
+	CommitIndex uint64
+	LastApplied uint64
+	NextIndex   map[uint64]uint64
+	MatchIndex  map[uint64]uint64
+
+	// Tick Counters (decremented on every tick).
+	HeartbeatTimeout uint64
+	ElectionTimeout  uint64
+
 	Storage RaftStorage
+}
+
+func (g *Group) ResetHeartbeatTimeout() {
+	atomic.StoreUint64(&g.HeartbeatTimeout, g.Config.HeartbeatTimeoutTicks)
+}
+
+func (g *Group) ResetElectionTimeout() {
+	atomic.StoreUint64(&g.ElectionTimeout, g.Config.ElectionTimeoutTicks)
 }
 
 var ErrInvalidConsensusGroup = errors.New("invalid consensus group")
 
 func (g *Group) HandleAppendEntries(a *raftproto.AppendEntriesRequest) (*raftproto.AppendEntriesResponse, error) {
-	// Check that the group is valid.
-	if a.ConsensusGroup != g.GroupID {
-		return nil, ErrInvalidConsensusGroup
-	}
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	// Term check.
-	if a.Term < g.State.Persistent.Term {
+	if a.Term < g.State.Term {
 		return &raftproto.AppendEntriesResponse{
 			ConsensusGroup: g.GroupID,
-			Term:           g.State.Persistent.Term,
+			Term:           g.State.Term,
 			Success:        false,
 		}, nil
 	}
@@ -53,7 +73,7 @@ func (g *Group) HandleAppendEntries(a *raftproto.AppendEntriesRequest) (*raftpro
 	if e.Term != a.PrevLogTerm {
 		return &raftproto.AppendEntriesResponse{
 			ConsensusGroup: g.GroupID,
-			Term:           g.State.Persistent.Term,
+			Term:           g.State.Term,
 			Success:        false,
 		}, nil
 	}
@@ -64,40 +84,36 @@ func (g *Group) HandleAppendEntries(a *raftproto.AppendEntriesRequest) (*raftpro
 			return nil, err
 		}
 
-		if a.LeaderCommit > g.State.Volatile.CommitIndex {
-			g.State.Volatile.CommitIndex = min(g.State.Volatile.CommitIndex, a.Entries[len(a.Entries)-1].Index)
+		if a.LeaderCommit > g.CommitIndex {
+			g.CommitIndex = min(g.CommitIndex, a.Entries[len(a.Entries)-1].Index)
 		}
 	}
 
-	// TODO: RESET TIMEOUT
-
 	return &raftproto.AppendEntriesResponse{
 		ConsensusGroup: g.GroupID,
-		Term:           g.State.Persistent.Term,
+		Term:           g.State.Term,
 		Success:        true,
 	}, nil
 }
 
 func (g *Group) HandleRequestVote(a *raftproto.RequestVoteRequest) (*raftproto.RequestVoteResponse, error) {
-	// Check that the group is valid.
-	if a.ConsensusGroup != g.GroupID {
-		return nil, ErrInvalidConsensusGroup
-	}
+	g.mu.Lock()
+	defer g.mu.Unlock()
 
 	// Term check.
-	if a.Term < g.State.Persistent.Term {
+	if a.Term < g.State.Term {
 		return &raftproto.RequestVoteResponse{
 			ConsensusGroup: g.GroupID,
-			Term:           g.State.Persistent.Term,
+			Term:           g.State.Term,
 			VoteGranted:    false,
 		}, nil
 	}
 
 	// Check If Vote Already Granted.
-	if g.State.Persistent.VotedTerm == g.State.Persistent.Term && g.State.Persistent.VotedFor != a.CandidateID {
+	if g.State.VotedTerm == g.State.Term && g.State.VotedFor != a.CandidateID {
 		return &raftproto.RequestVoteResponse{
 			ConsensusGroup: g.GroupID,
-			Term:           g.State.Persistent.Term,
+			Term:           g.State.Term,
 			VoteGranted:    false,
 		}, nil
 	}
@@ -114,14 +130,14 @@ func (g *Group) HandleRequestVote(a *raftproto.RequestVoteRequest) (*raftproto.R
 	if e.Term > a.LastLogTerm || (e.Term == a.LastLogTerm && e.Index > a.LastLogIndex) {
 		return &raftproto.RequestVoteResponse{
 			ConsensusGroup: g.GroupID,
-			Term:           g.State.Persistent.Term,
+			Term:           g.State.Term,
 			VoteGranted:    false,
 		}, nil
 	}
 
 	// Grant Vote.
-	g.State.Persistent.VotedFor = a.CandidateID
-	g.State.Persistent.VotedTerm = a.Term
+	g.State.VotedFor = a.CandidateID
+	g.State.VotedTerm = a.Term
 	err = g.Storage.StoreState(&g.State)
 	if err != nil {
 		return nil, err
@@ -129,7 +145,7 @@ func (g *Group) HandleRequestVote(a *raftproto.RequestVoteRequest) (*raftproto.R
 
 	return &raftproto.RequestVoteResponse{
 		ConsensusGroup: g.GroupID,
-		Term:           g.State.Persistent.Term,
+		Term:           g.State.Term,
 		VoteGranted:    true,
 	}, nil
 }

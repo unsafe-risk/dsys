@@ -80,137 +80,6 @@ func (m *Entry) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *PersistentState) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *PersistentState) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *PersistentState) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.VotedFor != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.VotedFor))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xf0
-	}
-	if m.VotedTerm != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.VotedTerm))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa0
-	}
-	if m.Term != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.Term))
-		i--
-		dAtA[i] = 0x50
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *VolatileState) MarshalVT() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *VolatileState) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *VolatileState) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.MatchIndex) > 0 {
-		for k := range m.MatchIndex {
-			v := m.MatchIndex[k]
-			baseI := i
-			i = encodeVarint(dAtA, i, uint64(v))
-			i--
-			dAtA[i] = 0x10
-			i = encodeVarint(dAtA, i, uint64(k))
-			i--
-			dAtA[i] = 0x8
-			i = encodeVarint(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x2
-			i--
-			dAtA[i] = 0xc2
-		}
-	}
-	if len(m.NextIndex) > 0 {
-		for k := range m.NextIndex {
-			v := m.NextIndex[k]
-			baseI := i
-			i = encodeVarint(dAtA, i, uint64(v))
-			i--
-			dAtA[i] = 0x10
-			i = encodeVarint(dAtA, i, uint64(k))
-			i--
-			dAtA[i] = 0x8
-			i = encodeVarint(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0xf2
-		}
-	}
-	if m.LastApplied != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.LastApplied))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xa0
-	}
-	if m.CommitIndex != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.CommitIndex))
-		i--
-		dAtA[i] = 0x50
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *State) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -241,27 +110,53 @@ func (m *State) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.Volatile != nil {
-		size, err := m.Volatile.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
+	if len(m.Nodes) > 0 {
+		var pksize2 int
+		for _, num := range m.Nodes {
+			pksize2 += sov(uint64(num))
 		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
+		i -= pksize2
+		j1 := i
+		for _, num := range m.Nodes {
+			for num >= 1<<7 {
+				dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA[j1] = uint8(num)
+			j1++
+		}
+		i = encodeVarint(dAtA, i, uint64(pksize2))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x92
+	}
+	if m.Leader != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Leader))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xc0
+	}
+	if m.VotedFor != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.VotedFor))
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0xa2
+		dAtA[i] = 0xf0
 	}
-	if m.Persistent != nil {
-		size, err := m.Persistent.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
+	if m.VotedTerm != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.VotedTerm))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.Term != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Term))
+		i--
+		dAtA[i] = 0x50
 	}
 	return len(dAtA) - i, nil
 }
@@ -350,13 +245,6 @@ func (m *AppendEntriesRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.LeaderCommit != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.LeaderCommit))
-		i--
-		dAtA[i] = 0x4
-		i--
-		dAtA[i] = 0xb0
-	}
 	if len(m.Entries) > 0 {
 		for iNdEx := len(m.Entries) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.Entries[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
@@ -366,10 +254,17 @@ func (m *AppendEntriesRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 			i -= size
 			i = encodeVarint(dAtA, i, uint64(size))
 			i--
-			dAtA[i] = 0x3
+			dAtA[i] = 0x4
 			i--
-			dAtA[i] = 0xe2
+			dAtA[i] = 0xb2
 		}
+	}
+	if m.LeaderCommit != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.LeaderCommit))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0xe0
 	}
 	if m.PrevLogTerm != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.PrevLogTerm))
@@ -771,7 +666,7 @@ func (m *Entry) SizeVT() (n int) {
 	return n
 }
 
-func (m *PersistentState) SizeVT() (n int) {
+func (m *State) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -786,59 +681,15 @@ func (m *PersistentState) SizeVT() (n int) {
 	if m.VotedFor != 0 {
 		n += 2 + sov(uint64(m.VotedFor))
 	}
-	if m.unknownFields != nil {
-		n += len(m.unknownFields)
+	if m.Leader != 0 {
+		n += 2 + sov(uint64(m.Leader))
 	}
-	return n
-}
-
-func (m *VolatileState) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.CommitIndex != 0 {
-		n += 1 + sov(uint64(m.CommitIndex))
-	}
-	if m.LastApplied != 0 {
-		n += 2 + sov(uint64(m.LastApplied))
-	}
-	if len(m.NextIndex) > 0 {
-		for k, v := range m.NextIndex {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + sov(uint64(k)) + 1 + sov(uint64(v))
-			n += mapEntrySize + 2 + sov(uint64(mapEntrySize))
+	if len(m.Nodes) > 0 {
+		l = 0
+		for _, e := range m.Nodes {
+			l += sov(uint64(e))
 		}
-	}
-	if len(m.MatchIndex) > 0 {
-		for k, v := range m.MatchIndex {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + sov(uint64(k)) + 1 + sov(uint64(v))
-			n += mapEntrySize + 2 + sov(uint64(mapEntrySize))
-		}
-	}
-	if m.unknownFields != nil {
-		n += len(m.unknownFields)
-	}
-	return n
-}
-
-func (m *State) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Persistent != nil {
-		l = m.Persistent.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
-	if m.Volatile != nil {
-		l = m.Volatile.SizeVT()
-		n += 2 + l + sov(uint64(l))
+		n += 2 + sov(uint64(l)) + l
 	}
 	if m.unknownFields != nil {
 		n += len(m.unknownFields)
@@ -889,14 +740,14 @@ func (m *AppendEntriesRequest) SizeVT() (n int) {
 	if m.PrevLogTerm != 0 {
 		n += 2 + sov(uint64(m.PrevLogTerm))
 	}
+	if m.LeaderCommit != 0 {
+		n += 2 + sov(uint64(m.LeaderCommit))
+	}
 	if len(m.Entries) > 0 {
 		for _, e := range m.Entries {
 			l = e.SizeVT()
 			n += 2 + l + sov(uint64(l))
 		}
-	}
-	if m.LeaderCommit != 0 {
-		n += 2 + sov(uint64(m.LeaderCommit))
 	}
 	if m.unknownFields != nil {
 		n += len(m.unknownFields)
@@ -1185,7 +1036,7 @@ func (m *Entry) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *PersistentState) UnmarshalVT(dAtA []byte) error {
+func (m *State) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1208,10 +1059,10 @@ func (m *PersistentState) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: PersistentState: wiretype end group for non-group")
+			return fmt.Errorf("proto: State: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PersistentState: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: State: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 10:
@@ -1271,199 +1122,11 @@ func (m *PersistentState) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *VolatileState) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: VolatileState: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: VolatileState: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CommitIndex", wireType)
-			}
-			m.CommitIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CommitIndex |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 20:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LastApplied", wireType)
-			}
-			m.LastApplied = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LastApplied |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 30:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextIndex", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NextIndex == nil {
-				m.NextIndex = make(map[uint64]uint64)
-			}
-			var mapkey uint64
-			var mapvalue uint64
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflow
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-				} else if fieldNum == 2 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflow
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skip(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLength
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.NextIndex[mapkey] = mapvalue
-			iNdEx = postIndex
 		case 40:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MatchIndex", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Leader", wireType)
 			}
-			var msglen int
+			m.Leader = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -1473,29 +1136,14 @@ func (m *VolatileState) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				m.Leader |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.MatchIndex == nil {
-				m.MatchIndex = make(map[uint64]uint64)
-			}
-			var mapkey uint64
-			var mapvalue uint64
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
+		case 50:
+			if wireType == 0 {
+				var v uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflow
@@ -1505,182 +1153,70 @@ func (m *VolatileState) UnmarshalVT(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= uint64(b&0x7F) << shift
+					v |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflow
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+				m.Nodes = append(m.Nodes, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflow
 					}
-				} else if fieldNum == 2 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflow
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skip(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLength
-					}
-					if (iNdEx + skippy) > postIndex {
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
 					}
-					iNdEx += skippy
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-			}
-			m.MatchIndex[mapkey] = mapvalue
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skip(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLength
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *State) UnmarshalVT(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflow
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: State: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: State: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Persistent", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
+				if packedLen < 0 {
+					return ErrInvalidLength
 				}
-				if iNdEx >= l {
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLength
+				}
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
 				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Persistent == nil {
-				m.Persistent = &PersistentState{}
-			}
-			if err := m.Persistent.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 20:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Volatile", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
+				elementCount = count
+				if elementCount != 0 && len(m.Nodes) == 0 {
+					m.Nodes = make([]uint64, 0, elementCount)
 				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflow
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Nodes = append(m.Nodes, v)
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nodes", wireType)
 			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Volatile == nil {
-				m.Volatile = &VolatileState{}
-			}
-			if err := m.Volatile.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -1951,6 +1487,25 @@ func (m *AppendEntriesRequest) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 		case 60:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LeaderCommit", wireType)
+			}
+			m.LeaderCommit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LeaderCommit |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 70:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Entries", wireType)
 			}
@@ -1984,25 +1539,6 @@ func (m *AppendEntriesRequest) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 70:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LeaderCommit", wireType)
-			}
-			m.LeaderCommit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LeaderCommit |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

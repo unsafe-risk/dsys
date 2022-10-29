@@ -15,23 +15,12 @@ message Entry {
     bytes Data = 40;
 }
 
-message PersistentState {
+message State {
     uint64 Term = 10;
     uint64 VotedTerm = 20;
     uint64 VotedFor = 30;
-}
-
-message VolatileState {
-    uint64 CommitIndex = 10;
-    uint64 LastApplied = 20;
-
-    map<uint64,uint64> NextIndex = 30;
-    map<uint64,uint64> MatchIndex = 40;
-}
-
-message State {
-    PersistentState Persistent = 10;
-    VolatileState Volatile = 20;
+    uint64 Leader = 40;
+    repeated uint64 Nodes = 50;
 }
 
 message Snapshot {
@@ -46,8 +35,8 @@ message AppendEntriesRequest {
     uint64 LeaderId = 30;
     uint64 PrevLogIndex = 40;
     uint64 PrevLogTerm = 50;
-    repeated Entry Entries = 60;
-    uint64 LeaderCommit = 70;
+    uint64 LeaderCommit = 60;
+    repeated Entry Entries = 70;
 }
 
 message AppendEntriesResponse {
