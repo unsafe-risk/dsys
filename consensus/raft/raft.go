@@ -149,3 +149,42 @@ func (g *Group) HandleRequestVote(a *raftproto.RequestVoteRequest) (*raftproto.R
 		VoteGranted:    true,
 	}, nil
 }
+
+const minusOne = ^uint64(0)
+
+// IsVoted requires the lock to be held.
+func (g *Group) IsVoted() bool {
+	return g.State.VotedTerm == g.State.Term && g.State.VotedFor != minusOne
+}
+
+func (g *Group) ConvertRole(term uint64, role Role) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	g.State.Term = term
+	g.State.VotedFor = minusOne
+	g.State.VotedTerm = minusOne
+	g.Role = role
+
+}
+
+func (g *Group) Tick() error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if g.CommitIndex > g.LastApplied {
+		// TODO: Apply log entries to state machine.
+	}
+
+	switch g.Role {
+	case RoleFollower:
+		ht := atomic.AddUint64(&g.HeartbeatTimeout, minusOne)
+		if ht <= 0 && g.IsVoted() {
+			// TODO: Convert to candidate.
+		}
+	case RoleLeader:
+	case RoleCandidate:
+	}
+
+	return nil
+}
