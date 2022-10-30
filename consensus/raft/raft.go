@@ -35,7 +35,8 @@ type Group struct {
 	HeartbeatTimeout uint64
 	ElectionTimeout  uint64
 
-	Storage RaftStorage
+	Storage      RaftStorage
+	StateMachine StateMachine
 }
 
 func (g *Group) ResetHeartbeatTimeout() {
@@ -173,13 +174,23 @@ func (g *Group) Tick() error {
 	defer g.mu.Unlock()
 
 	if g.CommitIndex > g.LastApplied {
-		// TODO: Apply log entries to state machine.
+		entries, err := g.Storage.GetRange(g.LastApplied+1, g.CommitIndex+1)
+		if err != nil {
+			return err
+		}
+
+		for i := range entries {
+			err = g.StateMachine.Apply(entries[i])
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	switch g.Role {
 	case RoleFollower:
 		ht := atomic.AddUint64(&g.HeartbeatTimeout, minusOne)
-		if ht <= 0 && g.IsVoted() {
+		if ht <= 0 && !g.IsVoted() {
 			// TODO: Convert to candidate.
 		}
 	case RoleLeader:

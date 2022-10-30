@@ -196,19 +196,40 @@ func (m *Snapshot) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Data)
 		i = encodeVarint(dAtA, i, uint64(len(m.Data)))
 		i--
-		dAtA[i] = 0x1
+		dAtA[i] = 0x3
 		i--
-		dAtA[i] = 0xf2
+		dAtA[i] = 0xe2
+	}
+	if m.Offset != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Offset))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x90
+	}
+	if m.Size != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Size))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xc0
 	}
 	if m.LastIncludedTerm != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.LastIncludedTerm))
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0xa0
+		dAtA[i] = 0xf0
 	}
 	if m.LastIncludedIndex != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.LastIncludedIndex))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.SnapshotID != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.SnapshotID))
 		i--
 		dAtA[i] = 0x50
 	}
@@ -703,11 +724,20 @@ func (m *Snapshot) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.SnapshotID != 0 {
+		n += 1 + sov(uint64(m.SnapshotID))
+	}
 	if m.LastIncludedIndex != 0 {
-		n += 1 + sov(uint64(m.LastIncludedIndex))
+		n += 2 + sov(uint64(m.LastIncludedIndex))
 	}
 	if m.LastIncludedTerm != 0 {
 		n += 2 + sov(uint64(m.LastIncludedTerm))
+	}
+	if m.Size != 0 {
+		n += 2 + sov(uint64(m.Size))
+	}
+	if m.Offset != 0 {
+		n += 2 + sov(uint64(m.Offset))
 	}
 	l = len(m.Data)
 	if l > 0 {
@@ -1270,6 +1300,25 @@ func (m *Snapshot) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 10:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SnapshotID", wireType)
+			}
+			m.SnapshotID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SnapshotID |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 20:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastIncludedIndex", wireType)
 			}
 			m.LastIncludedIndex = 0
@@ -1287,7 +1336,7 @@ func (m *Snapshot) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 20:
+		case 30:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LastIncludedTerm", wireType)
 			}
@@ -1306,7 +1355,45 @@ func (m *Snapshot) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 30:
+		case 40:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Size", wireType)
+			}
+			m.Size = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Size |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 50:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Offset", wireType)
+			}
+			m.Offset = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Offset |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 60:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}

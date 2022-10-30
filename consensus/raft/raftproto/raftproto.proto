@@ -24,9 +24,12 @@ message State {
 }
 
 message Snapshot {
-    uint64 LastIncludedIndex = 10;
-    uint64 LastIncludedTerm = 20;
-    bytes Data = 30;
+    uint64 SnapshotID = 10; // Snowflake ID
+    uint64 LastIncludedIndex = 20;
+    uint64 LastIncludedTerm = 30;
+    uint64 Size = 40;
+    uint64 Offset = 50;
+    bytes Data = 60;
 }
 
 message AppendEntriesRequest {
