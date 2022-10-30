@@ -33,9 +33,6 @@ jobs:
     - name: Download
       run: go mod download
     
-    - name: Generate
-      run: go generate
-
     - name: Build
       run: go build -v ./...
 
