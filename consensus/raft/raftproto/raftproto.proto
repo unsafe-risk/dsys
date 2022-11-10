@@ -62,12 +62,17 @@ message RequestVoteResponse {
     bool VoteGranted = 30;
 }
 
-message Message {
+message RPCMessage {
+    uint64 ConsensusGroup = 10;
+    uint64 From = 20;
+    uint64 To = 30;
+    uint64 Term = 40;
+    uint64 Timestamp = 50;
     oneof Message {
-        AppendEntriesRequest AppendEntriesRequest = 10;
-        AppendEntriesResponse AppendEntriesResponse = 20;
-        RequestVoteRequest RequestVoteRequest = 30;
-        RequestVoteResponse RequestVoteResponse = 40;
+        AppendEntriesRequest AppendEntriesRequest = 100;
+        AppendEntriesResponse AppendEntriesResponse = 101;
+        RequestVoteRequest RequestVoteRequest = 102;
+        RequestVoteResponse RequestVoteResponse = 103;
     }
 }
 

@@ -10,6 +10,7 @@ plugins:
       - features=pool+marshal+unmarshal+size
       - pool=v8.run/go/dsys/proto.Address
       - pool=v8.run/go/dsys/consensus/raft/raftproto.Entry
+      - pool=v8.run/go/dsys/consensus/raft/raftproto.RPCMessage
   - name: go-grpc
     out: .
     opt: paths=source_relative

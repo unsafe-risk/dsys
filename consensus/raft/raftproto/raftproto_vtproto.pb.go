@@ -503,7 +503,7 @@ func (m *RequestVoteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Message) MarshalVT() (dAtA []byte, err error) {
+func (m *RPCMessage) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -516,12 +516,12 @@ func (m *Message) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Message) MarshalToVT(dAtA []byte) (int, error) {
+func (m *RPCMessage) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *Message) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *RPCMessage) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -545,15 +545,48 @@ func (m *Message) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			}
 		}
 	}
+	if m.Timestamp != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Timestamp))
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0x90
+	}
+	if m.Term != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.Term))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xc0
+	}
+	if m.To != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.To))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf0
+	}
+	if m.From != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.From))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.ConsensusGroup != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.ConsensusGroup))
+		i--
+		dAtA[i] = 0x50
+	}
 	return len(dAtA) - i, nil
 }
 
-func (m *Message_AppendEntriesRequest) MarshalToVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_AppendEntriesRequest) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *Message_AppendEntriesRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_AppendEntriesRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.AppendEntriesRequest != nil {
 		size, err := m.AppendEntriesRequest.MarshalToSizedBufferVT(dAtA[:i])
@@ -563,16 +596,18 @@ func (m *Message_AppendEntriesRequest) MarshalToSizedBufferVT(dAtA []byte) (int,
 		i -= size
 		i = encodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x6
+		i--
+		dAtA[i] = 0xa2
 	}
 	return len(dAtA) - i, nil
 }
-func (m *Message_AppendEntriesResponse) MarshalToVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_AppendEntriesResponse) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *Message_AppendEntriesResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_AppendEntriesResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.AppendEntriesResponse != nil {
 		size, err := m.AppendEntriesResponse.MarshalToSizedBufferVT(dAtA[:i])
@@ -582,18 +617,18 @@ func (m *Message_AppendEntriesResponse) MarshalToSizedBufferVT(dAtA []byte) (int
 		i -= size
 		i = encodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x1
+		dAtA[i] = 0x6
 		i--
-		dAtA[i] = 0xa2
+		dAtA[i] = 0xaa
 	}
 	return len(dAtA) - i, nil
 }
-func (m *Message_RequestVoteRequest) MarshalToVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_RequestVoteRequest) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *Message_RequestVoteRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_RequestVoteRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.RequestVoteRequest != nil {
 		size, err := m.RequestVoteRequest.MarshalToSizedBufferVT(dAtA[:i])
@@ -603,18 +638,18 @@ func (m *Message_RequestVoteRequest) MarshalToSizedBufferVT(dAtA []byte) (int, e
 		i -= size
 		i = encodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x1
+		dAtA[i] = 0x6
 		i--
-		dAtA[i] = 0xf2
+		dAtA[i] = 0xb2
 	}
 	return len(dAtA) - i, nil
 }
-func (m *Message_RequestVoteResponse) MarshalToVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_RequestVoteResponse) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *Message_RequestVoteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *RPCMessage_RequestVoteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.RequestVoteResponse != nil {
 		size, err := m.RequestVoteResponse.MarshalToSizedBufferVT(dAtA[:i])
@@ -624,9 +659,9 @@ func (m *Message_RequestVoteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, 
 		i -= size
 		i = encodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x2
+		dAtA[i] = 0x6
 		i--
-		dAtA[i] = 0xc2
+		dAtA[i] = 0xba
 	}
 	return len(dAtA) - i, nil
 }
@@ -661,6 +696,25 @@ func (m *Entry) ReturnToVTPool() {
 }
 func EntryFromVTPool() *Entry {
 	return vtprotoPool_Entry.Get().(*Entry)
+}
+
+var vtprotoPool_RPCMessage = sync.Pool{
+	New: func() interface{} {
+		return &RPCMessage{}
+	},
+}
+
+func (m *RPCMessage) ResetVT() {
+	m.Reset()
+}
+func (m *RPCMessage) ReturnToVTPool() {
+	if m != nil {
+		m.ResetVT()
+		vtprotoPool_RPCMessage.Put(m)
+	}
+}
+func RPCMessageFromVTPool() *RPCMessage {
+	return vtprotoPool_RPCMessage.Get().(*RPCMessage)
 }
 func (m *Entry) SizeVT() (n int) {
 	if m == nil {
@@ -854,12 +908,27 @@ func (m *RequestVoteResponse) SizeVT() (n int) {
 	return n
 }
 
-func (m *Message) SizeVT() (n int) {
+func (m *RPCMessage) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	if m.ConsensusGroup != 0 {
+		n += 1 + sov(uint64(m.ConsensusGroup))
+	}
+	if m.From != 0 {
+		n += 2 + sov(uint64(m.From))
+	}
+	if m.To != 0 {
+		n += 2 + sov(uint64(m.To))
+	}
+	if m.Term != 0 {
+		n += 2 + sov(uint64(m.Term))
+	}
+	if m.Timestamp != 0 {
+		n += 2 + sov(uint64(m.Timestamp))
+	}
 	if vtmsg, ok := m.Message.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
 	}
@@ -869,7 +938,7 @@ func (m *Message) SizeVT() (n int) {
 	return n
 }
 
-func (m *Message_AppendEntriesRequest) SizeVT() (n int) {
+func (m *RPCMessage_AppendEntriesRequest) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -877,11 +946,11 @@ func (m *Message_AppendEntriesRequest) SizeVT() (n int) {
 	_ = l
 	if m.AppendEntriesRequest != nil {
 		l = m.AppendEntriesRequest.SizeVT()
-		n += 1 + l + sov(uint64(l))
+		n += 2 + l + sov(uint64(l))
 	}
 	return n
 }
-func (m *Message_AppendEntriesResponse) SizeVT() (n int) {
+func (m *RPCMessage_AppendEntriesResponse) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -893,7 +962,7 @@ func (m *Message_AppendEntriesResponse) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *Message_RequestVoteRequest) SizeVT() (n int) {
+func (m *RPCMessage_RequestVoteRequest) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -905,7 +974,7 @@ func (m *Message_RequestVoteRequest) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *Message_RequestVoteResponse) SizeVT() (n int) {
+func (m *RPCMessage_RequestVoteResponse) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2012,7 +2081,7 @@ func (m *RequestVoteResponse) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Message) UnmarshalVT(dAtA []byte) error {
+func (m *RPCMessage) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2035,13 +2104,108 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Message: wiretype end group for non-group")
+			return fmt.Errorf("proto: RPCMessage: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Message: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RPCMessage: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConsensusGroup", wireType)
+			}
+			m.ConsensusGroup = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ConsensusGroup |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 20:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			m.From = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.From |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 30:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
+			}
+			m.To = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.To |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 40:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Term", wireType)
+			}
+			m.Term = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Term |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 50:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			m.Timestamp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Timestamp |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 100:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AppendEntriesRequest", wireType)
 			}
@@ -2070,7 +2234,7 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Message.(*Message_AppendEntriesRequest); ok {
+			if oneof, ok := m.Message.(*RPCMessage_AppendEntriesRequest); ok {
 				if err := oneof.AppendEntriesRequest.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -2079,10 +2243,10 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Message = &Message_AppendEntriesRequest{v}
+				m.Message = &RPCMessage_AppendEntriesRequest{v}
 			}
 			iNdEx = postIndex
-		case 20:
+		case 101:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AppendEntriesResponse", wireType)
 			}
@@ -2111,7 +2275,7 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Message.(*Message_AppendEntriesResponse); ok {
+			if oneof, ok := m.Message.(*RPCMessage_AppendEntriesResponse); ok {
 				if err := oneof.AppendEntriesResponse.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -2120,10 +2284,10 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Message = &Message_AppendEntriesResponse{v}
+				m.Message = &RPCMessage_AppendEntriesResponse{v}
 			}
 			iNdEx = postIndex
-		case 30:
+		case 102:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequestVoteRequest", wireType)
 			}
@@ -2152,7 +2316,7 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Message.(*Message_RequestVoteRequest); ok {
+			if oneof, ok := m.Message.(*RPCMessage_RequestVoteRequest); ok {
 				if err := oneof.RequestVoteRequest.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -2161,10 +2325,10 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Message = &Message_RequestVoteRequest{v}
+				m.Message = &RPCMessage_RequestVoteRequest{v}
 			}
 			iNdEx = postIndex
-		case 40:
+		case 103:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequestVoteResponse", wireType)
 			}
@@ -2193,7 +2357,7 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Message.(*Message_RequestVoteResponse); ok {
+			if oneof, ok := m.Message.(*RPCMessage_RequestVoteResponse); ok {
 				if err := oneof.RequestVoteResponse.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
@@ -2202,7 +2366,7 @@ func (m *Message) UnmarshalVT(dAtA []byte) error {
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Message = &Message_RequestVoteResponse{v}
+				m.Message = &RPCMessage_RequestVoteResponse{v}
 			}
 			iNdEx = postIndex
 		default:

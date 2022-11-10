@@ -35,6 +35,13 @@ type Group struct {
 	HeartbeatTimeout uint64
 	ElectionTimeout  uint64
 
+	// Message Queues.
+	RecvQueue []raftproto.RPCMessage
+	SendQueue []raftproto.RPCMessage
+
+	// Received Votes.
+	Votes uint64
+
 	Storage      RaftStorage
 	StateMachine StateMachine
 }
@@ -50,9 +57,6 @@ func (g *Group) ResetElectionTimeout() {
 var ErrInvalidConsensusGroup = errors.New("invalid consensus group")
 
 func (g *Group) HandleAppendEntries(a *raftproto.AppendEntriesRequest) (*raftproto.AppendEntriesResponse, error) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	// Term check.
 	if a.Term < g.State.Term {
 		return &raftproto.AppendEntriesResponse{
@@ -98,9 +102,6 @@ func (g *Group) HandleAppendEntries(a *raftproto.AppendEntriesRequest) (*raftpro
 }
 
 func (g *Group) HandleRequestVote(a *raftproto.RequestVoteRequest) (*raftproto.RequestVoteResponse, error) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	// Term check.
 	if a.Term < g.State.Term {
 		return &raftproto.RequestVoteResponse{
@@ -158,20 +159,77 @@ func (g *Group) IsVoted() bool {
 	return g.State.VotedTerm == g.State.Term && g.State.VotedFor != minusOne
 }
 
-func (g *Group) ConvertRole(term uint64, role Role) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
+// convertRole requires the lock to be held.
+func (g *Group) convertRole(term uint64, role Role) {
 	g.State.Term = term
 	g.State.VotedFor = minusOne
 	g.State.VotedTerm = minusOne
 	g.Role = role
+}
 
+// startElection requires the lock to be held.
+func (g *Group) startElection() error {
+	g.convertRole(g.State.Term+1, RoleCandidate)
+
+	// Vote for self.
+	g.State.VotedFor = g.NodeID
+	g.State.VotedTerm = g.State.Term
+	err := g.Storage.StoreState(&g.State)
+	if err != nil {
+		return err
+	}
+
+	// Reset election timeout.
+	g.ResetElectionTimeout()
+
+	// Send RequestVote RPCs to all other servers.
+	for i := range g.State.Nodes {
+		// TODO: Optimize this.
+		if g.State.Nodes[i] == g.NodeID {
+			continue
+		}
+
+		e := raftproto.EntryFromVTPool()
+		err := g.Storage.Last(e)
+		if err != nil {
+			e.ReturnToVTPool()
+			return err
+		}
+		lastIndex := e.Index
+		lastTerm := e.Term
+		e.ReturnToVTPool()
+
+		g.SendQueue = append(g.SendQueue, raftproto.RPCMessage{
+			ConsensusGroup: g.GroupID,
+			From:           g.NodeID,
+			To:             g.State.Nodes[i],
+			Timestamp:      g.GetTimeStamp(),
+			Message: &raftproto.RPCMessage_RequestVoteRequest{
+				RequestVoteRequest: &raftproto.RequestVoteRequest{
+					ConsensusGroup: g.GroupID,
+					Term:           g.State.Term,
+					CandidateID:    g.NodeID,
+					LastLogIndex:   lastIndex,
+					LastLogTerm:    lastTerm,
+				},
+			},
+		})
+	}
+
+	return nil
 }
 
 func (g *Group) Tick() error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+
+	// If RPCMessage's Term is greater than the current term, update the current term and convert to follower.
+	for i := range g.RecvQueue {
+		if g.RecvQueue[i].Term > g.State.Term {
+			g.convertRole(g.RecvQueue[i].Term, RoleFollower)
+			g.ResetHeartbeatTimeout()
+		}
+	}
 
 	if g.CommitIndex > g.LastApplied {
 		entries, err := g.Storage.GetRange(g.LastApplied+1, g.CommitIndex+1)
@@ -187,14 +245,70 @@ func (g *Group) Tick() error {
 		}
 	}
 
+ROLE_CONV:
 	switch g.Role {
 	case RoleFollower:
 		ht := atomic.AddUint64(&g.HeartbeatTimeout, minusOne)
 		if ht <= 0 && !g.IsVoted() {
-			// TODO: Convert to candidate.
+			err := g.startElection()
+			if err != nil {
+				return err
+			}
+			goto ROLE_CONV
 		}
-	case RoleLeader:
+
+		// Respond to RPCMessages.
+		for i := range g.RecvQueue {
+			switch v := g.RecvQueue[i].Message.(type) {
+			case *raftproto.RPCMessage_AppendEntriesRequest:
+				resp, err := g.HandleAppendEntries(v.AppendEntriesRequest)
+				if err != nil {
+					return err
+				}
+				if resp.Success {
+					g.ResetHeartbeatTimeout()
+					g.State.Leader = g.RecvQueue[i].From
+				}
+				g.SendQueue = append(g.SendQueue, raftproto.RPCMessage{
+					ConsensusGroup: g.GroupID,
+					From:           g.NodeID,
+					To:             g.RecvQueue[i].From,
+					Term:           g.State.Term,
+					Timestamp:      g.GetTimeStamp(),
+					Message: &raftproto.RPCMessage_AppendEntriesResponse{
+						AppendEntriesResponse: resp,
+					},
+				})
+			case *raftproto.RPCMessage_RequestVoteRequest:
+				resp, err := g.HandleRequestVote(v.RequestVoteRequest)
+				if err != nil {
+					return err
+				}
+				if resp.VoteGranted {
+					g.ResetHeartbeatTimeout()
+				}
+				g.SendQueue = append(g.SendQueue, raftproto.RPCMessage{
+					ConsensusGroup: g.GroupID,
+					From:           g.NodeID,
+					To:             g.RecvQueue[i].From,
+					Term:           g.State.Term,
+					Timestamp:      g.GetTimeStamp(),
+					Message: &raftproto.RPCMessage_RequestVoteResponse{
+						RequestVoteResponse: resp,
+					},
+				})
+			}
+		}
 	case RoleCandidate:
+		et := atomic.AddUint64(&g.ElectionTimeout, minusOne)
+		if et <= 0 {
+			err := g.startElection()
+			if err != nil {
+				return err
+			}
+		}
+
+	case RoleLeader:
 	}
 
 	return nil
