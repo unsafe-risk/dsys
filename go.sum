@@ -99,3 +99,5 @@ honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWh
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 v8.run/go/exp v0.0.17 h1:DVDrrJ6eEldikRGNJ3JR88PhErSGkiIYIgUMQyR7N/4=
 v8.run/go/exp v0.0.17/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
+v8.run/go/exp v0.0.19 h1:J154z1iRPQZ9wNUdJ44UPoarLHOVHaYIIUatQKarMN4=
+v8.run/go/exp v0.0.19/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
