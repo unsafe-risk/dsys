@@ -7,7 +7,7 @@ require (
 	github.com/planetscale/vtprotobuf v0.3.0
 	github.com/zeebo/blake3 v0.2.3
 	golang.org/x/crypto v0.1.0
-	google.golang.org/grpc v1.50.1
+	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
 	v8.run/go/exp v0.0.19
 )
