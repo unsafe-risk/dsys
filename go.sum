@@ -101,3 +101,5 @@ v8.run/go/exp v0.0.17 h1:DVDrrJ6eEldikRGNJ3JR88PhErSGkiIYIgUMQyR7N/4=
 v8.run/go/exp v0.0.17/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
 v8.run/go/exp v0.0.19 h1:J154z1iRPQZ9wNUdJ44UPoarLHOVHaYIIUatQKarMN4=
 v8.run/go/exp v0.0.19/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
+v8.run/go/exp v0.0.20 h1:suoul0LA6/wT1A32PLcJTBtoLhAZfssIBSHGqaZUQC8=
+v8.run/go/exp v0.0.20/go.mod h1:PXvWlnUgCKNPDInXVYZ9HHVxvnGDT9l5w8m09H5mN/U=
