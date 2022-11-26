@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package="v8.run/go/dsys/consensus/vsr/vrproto";
+
+package vrproto;
+
+message Request {
+    uint64 ClientID = 1;
+    uint64 RequestID = 2;
+
+    bytes Data = 3;
+}
+
+message Node {
+    uint64 ID = 1;
+    string Address = 2;
+}
+
+message LogEntry {
+    uint64 Index = 1;
+}
